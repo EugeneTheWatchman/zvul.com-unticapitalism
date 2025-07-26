@@ -1,0 +1,38 @@
+// ==UserScript==
+// @name         zvuk.com вкладка всегда активна
+// @namespace    http://tampermonkey.net/
+// @version      1.1
+// @description  Эмуляция активной вкладки для плеера zvuk.com
+// @match        https://zvuk.com/*
+// @run-at       document-start
+// ==/UserScript==
+
+(function () {
+
+    Object.defineProperty(document, "hidden", {
+        get: () => false,
+        configurable: true
+    });
+
+
+    Object.defineProperty(document, "visibilityState", {
+        get: () => "visible",
+        configurable: true
+    });
+    const stopEvents = ["visibilitychange", "blur", "pagehide", "freeze"];
+    for (const evt of stopEvents) {
+        window.addEventListener(evt, (e) => {
+            e.stopImmediatePropagation();
+        }, true);
+    }
+
+
+    const noop = () => {};
+    const overrideLifecycle = ['onfreeze', 'onpagehide'];
+    overrideLifecycle.forEach(prop => {
+        Object.defineProperty(document, prop, {
+            get: () => null,
+            set: noop
+        });
+    });
+})();
